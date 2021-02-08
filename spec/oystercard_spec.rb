@@ -29,12 +29,12 @@ describe Oystercard do
         expect { subject.touch_in(station) }.to raise_error 'Not enough money'
       end
     end
-    context 'when balance is above minimum journey fare' do 
+    context 'when balance is above minimum journey fare' do
       before { subject.top_up(20) }
-      it 'saves entry station' do 
+      it 'saves entry station' do
         expect { subject.touch_in(station) }.to change {subject.entry_station }.to (station)
-        end 
-      end 
+        end
+      end
   end
 
   describe '#touch_out' do
@@ -68,8 +68,9 @@ describe Oystercard do
       end
 
       context 'then touching out' do
+        before { subject.touch_out }
         it 'changes back to false' do
-          expect(subject.send(:touch_out)).to be false
+          expect(subject.send(:in_journey?)).to be false
         end
       end
     end

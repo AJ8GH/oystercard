@@ -18,6 +18,7 @@ class Oystercard
   def touch_out
     deduct(1)
     update_journey_status
+    self.entry_station = nil
   end
 
   private
@@ -56,7 +57,7 @@ class Oystercard
   end
 
   def update_journey_status
-    if in_journey?
+    if entry_station
       self.in_journey = false
     else
       self.in_journey = true
