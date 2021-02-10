@@ -1,51 +1,44 @@
 class Oystercard
-  attr_reader :balance, :limit, :entry_station
+  attr_reader :balance, :limit, :entry_station, :exit_station, :journeys
 
   MAXIMUM_LIMIT = 90
   MINIMUM_FARE = 1
 
   def top_up(amount)
-    top_up_limit_guard(amount)
+    raise MaximumBalanceError if over_limit?(amount)
     self.balance += amount
   end
 
   def touch_in(station)
-    low_balance_guard
-    update_journey_status
+    raise LowBalanceError if low_balance?
     self.entry_station = station
   end
 
-  def touch_out
-    deduct(1)
-    update_journey_status
+  def touch_out(station)
+    deduct(MINIMUM_FARE)
+    self.exit_station = station
+    save_journey
     self.entry_station = nil
+  end
+
+  def journey_history
+    journeys.map { |journey| journey.values.join(' to ') }.join("\n")
   end
 
   private
 
-  attr_writer :balance, :entry_station
-  attr_accessor :in_journey
-
-  alias :in_journey? :in_journey
-  undef :in_journey
+  attr_writer :balance, :entry_station, :exit_station, :journeys
 
   def initialize
     @balance = 0
     @limit = MAXIMUM_LIMIT
-    @in_journey = false
     @entry_station = nil
-  end
-
-  def low_balance_guard
-    fail 'Not enough money' if low_balance?
+    @exit_station = nil
+    @journeys = []
   end
 
   def low_balance?
     balance < MINIMUM_FARE
-  end
-
-  def top_up_limit_guard(amount)
-    fail "#{amount} is over limit!" if over_limit?(amount)
   end
 
   def over_limit?(amount)
@@ -56,11 +49,11 @@ class Oystercard
     self.balance -= amount
   end
 
-  def update_journey_status
-    if entry_station
-      self.in_journey = false
-    else
-      self.in_journey = true
-    end
+  def in_journey?
+    !!entry_station
+  end
+
+  def save_journey
+    journeys << {entry_station: entry_station.name, exit_station: exit_station.name}
   end
 end
