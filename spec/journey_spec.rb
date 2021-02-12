@@ -21,4 +21,12 @@ describe Journey do
       expect(subject).to be_complete
     end
   end
+
+  describe '#fare' do
+    context 'when complete' do
+      it 'is minimum fare' do
+        expect(subject.fare).to be Fares::MINIMUM_FARE
+      end
+    end
+  end
 end
