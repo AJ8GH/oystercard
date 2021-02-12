@@ -11,19 +11,13 @@ class Oystercard
 
   def touch_in(station)
     raise LowBalanceError if low_balance?
-    self.entry_station = station
   end
 
   def touch_out(station)
     deduct(MINIMUM_FARE)
-    self.exit_station = station
-    save_journey
-    self.entry_station = nil
   end
 
-  def journey_history
-    journeys.map { |journey| journey.values.join(' to ') }.join("\n")
-  end
+
 
   private
 
@@ -32,9 +26,6 @@ class Oystercard
   def initialize
     @balance = 0
     @limit = MAXIMUM_LIMIT
-    @entry_station = nil
-    @exit_station = nil
-    @journeys = []
   end
 
   def low_balance?
@@ -49,11 +40,4 @@ class Oystercard
     self.balance -= amount
   end
 
-  def in_journey?
-    !!entry_station
-  end
-
-  def save_journey
-    journeys << {entry_station: entry_station.name, exit_station: exit_station.name}
-  end
 end

@@ -1,8 +1,8 @@
 require 'journey'
 
 describe Journey do
-  let(:entry_station) { instance_double(Station, :entry_station) }
-  let(:exit_station) { instance_double(Station, :exit_station) }
+  let(:entry_station) { instance_double(Station, :entry_station, zone: 2) }
+  let(:exit_station) { instance_double(Station, :exit_station, zone: 1) }
   subject { described_class.new(entry_station: entry_station) }
 
   context ' when initialized with entry station' do
@@ -22,10 +22,18 @@ describe Journey do
     end
   end
 
+
+
   describe '#fare' do
-    context 'when complete' do
+    context 'when journey is complete deduct minimum fares' do
       it 'is minimum fare' do
-        expect(subject.fare).to be Fares::MINIMUM_FARE
+        complete_journey = Journey.new(:entry_station => entry_station, :exit_station => exit_station)
+        expect(complete_journey.fare).to be Oystercard::MINIMUM_FARE
+      end
+
+      it 'when journey is incomple at touch_in deduct PENALTY' do
+        incomplete_journey = Journey.new(:entry_station => entry_station)
+        expect(incomplete_journey.fare).to eq Journey::PENALTY
       end
     end
   end
