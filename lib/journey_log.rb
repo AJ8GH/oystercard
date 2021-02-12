@@ -14,6 +14,7 @@ class JourneyLog
   end
 
   def finish(station)
+    self.current_journey = journey_class.new(exit_station: station) unless current_journey
     current_journey.exit_station = station
     journey_history << current_journey
   end
